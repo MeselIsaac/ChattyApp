@@ -1,5 +1,6 @@
 const express = require('express');
 const SocketServer = require('ws').Server;
+const uuidv4 = require('uuid/v4');
 
 // Set the port to 3001
 const PORT = 3001;
@@ -18,8 +19,16 @@ const wss = new SocketServer({ server });
 // the ws parameter in the callback.
 wss.on('connection', (ws) => {
   console.log('Client connected YAY');
-  ws.on("message", function incoming(message) {
-    console.log(JSON.parse(message))
+  ws.on("message", message => {
+    const messageObj = JSON.parse(message);
+
+    const messageToBroadcast = {
+      id: uuidv4(),
+      content: messageObj.content,
+      username: messageObj.username
+
+    }
+    console.log(messageToBroadcast)
   })
   // this.socket.onmessage = function (event) {
   //   console.log(event.data);
