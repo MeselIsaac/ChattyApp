@@ -13,23 +13,22 @@ class App extends Component {
     };
 
     this.addMessage = this.addMessage.bind(this);
+    this.receiveMessageFromServer = this.receiveMessageFromServer.bind(this);
   }
 
   addMessage(message, username) {
     const messageObj = {
       username: this.state.currentUser.name,
       content: message,
-      id: Math.random()
     }
-    const messages = this.state.messages.concat(messageObj)
-    this.setState({messages: messages})
     this.socket.send(JSON.stringify(messageObj));
+    
   }
 
-  receiveMessageFromServer(event) {
-    const message = (JSON.parse(event.data));
-
-    console.log(message)
+  receiveMessageFromServer (event) {
+    const message = JSON.parse(event.data);
+    const messages = this.state.messages.concat(message);
+    this.setState({messages: messages})
 
   }
 
@@ -38,13 +37,12 @@ class App extends Component {
     this.socket = new WebSocket ("ws://localhost:3001");
     this.socket.onopen = () => console.log("Client connected here");
     this.socket.onmessage = this.receiveMessageFromServer;
+    
 
   }
   
-
-
-
   render() {
+    console.log("THIS.STATE.MESSAGES", this.state.messages)
     return (
       <div>
         <nav className="navbar">
