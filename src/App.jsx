@@ -34,12 +34,14 @@ class App extends Component {
     }
     const messages = this.state.messages.concat(messageObj)
     this.setState({messages: messages})
+    this.socket.send(JSON.stringify(messageObj));
   }
 
   componentDidMount() {
+    //connecting react app to websocket
     this.socket = new WebSocket ("ws://localhost:3001");
     this.socket.onopen = () => {
-    console.log("Client connected");
+    console.log("Client connected here");
    }
 
     // console.log("componentDidMount <App />");
@@ -57,7 +59,6 @@ class App extends Component {
 
 
   render() {
-    console.log(this.state)
     return (
       <div>
         <nav className="navbar">
