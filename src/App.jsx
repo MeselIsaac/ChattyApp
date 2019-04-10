@@ -21,6 +21,18 @@ class App extends Component {
         }
       ]
     };
+
+    this.addMessage = this.addMessage.bind(this);
+  }
+
+  addMessage(message, username) {
+    const messageObj = {
+      username: this.state.currentUser.name,
+      content: message,
+      id: Math.random()
+    }
+    const messages = this.state.messages.concat(messageObj)
+    this.setState({messages: messages})
   }
 
   componentDidMount() {
@@ -39,13 +51,14 @@ class App extends Component {
 
 
   render() {
+    console.log(this.state)
     return (
       <div>
         <nav className="navbar">
           <a href="/" className="navbar-brand">Chatty</a>
         </nav>
         <MessageList messages = {this.state.messages}/>
-        <ChatBar currentUser= {this.state.currentUser.name} />
+        <ChatBar addMessage = {this.addMessage} currentUser= {this.state.currentUser.name} />
       </div>
      
     );
