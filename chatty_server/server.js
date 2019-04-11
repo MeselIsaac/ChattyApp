@@ -44,7 +44,7 @@ wss.on('connection', (ws) => {
     const data = JSON.parse(message);
     switch(data.type) {
 
-      case "postMessage":
+      case "messageToServer":
 
       const messageToBroadcast = {
         type: "incomingMessage",
@@ -57,7 +57,7 @@ wss.on('connection', (ws) => {
 
       break;
 
-      case "postNotification":
+      case "notificationToServer":
 
       const usernameToBroadcast = {
         type: "incomingNotification",
