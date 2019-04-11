@@ -29,6 +29,17 @@ wss.broadcast = data => {
 // the ws parameter in the callback.
 wss.on('connection', (ws) => {
   console.log('Client connected YAY');
+  console.log("COUNT -------->", wss.clients.size)
+
+  
+  const userCount = {
+    type: "userCountChange",
+    userCount: wss.clients.size
+  }
+  wss.broadcast(JSON.stringify(userCount));
+
+  
+  
   ws.on("message", message => {
     const data = JSON.parse(message);
     switch(data.type) {
@@ -42,7 +53,6 @@ wss.on('connection', (ws) => {
         username: data.username
 
       }
-      console.log(messageToBroadcast);
       wss.broadcast(JSON.stringify(messageToBroadcast));
 
       break;
@@ -56,7 +66,7 @@ wss.on('connection', (ws) => {
 
       }
 
-      console.log(usernameToBroadcast);
+      
       wss.broadcast(JSON.stringify(usernameToBroadcast));
 
       break;
@@ -65,8 +75,21 @@ wss.on('connection', (ws) => {
       throw new Error("Unknown event type " + data.type);
 
     }
+    
    
   })
+  ws.on('close', () => {
+    console.log('NO Client disconnected')
+    console.log(wss.clients.size)
+    const userCount = {
+      type: "userCountChange",
+      userCount: wss.clients.size
+    }
+    wss.broadcast(JSON.stringify(userCount));
+
+    // At this point in time wss.clients no longer contains the ws object
+    // of the client who disconnected
+  });
  
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.

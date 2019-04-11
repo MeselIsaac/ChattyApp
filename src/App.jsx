@@ -9,7 +9,8 @@ class App extends Component {
 
     this.state = {
       currentUser: {name: "Anonymous"}, // optional. if currentUser is not defined, it means the user is Anonymous
-      messages: []
+      messages: [],
+      userCount: {count: 0}
     };
 
     this.addMessage = this.addMessage.bind(this);
@@ -57,22 +58,33 @@ class App extends Component {
   componentDidMount() {
     //connecting react app to websocket
     this.socket = new WebSocket ("ws://localhost:3001");
-    this.socket.onopen = () => console.log("Client connected here");
+    this.socket.onopen = () => {console.log("Connected");
+    }
     // this.socket.onmessage = this.receiveMessageFromServer;
 
     this.socket.onmessage = (event) => {
       // The socket event data is encoded as a JSON string.
       // This line turns it into an object
+      // console.log(event)
       const data = JSON.parse(event.data);
       switch(data.type) {
+
+        case "userCountChange":
+
+
+        
+        this.setState({userCount: {count: data.userCount}})
+
+        break;
+
         case "incomingMessage":
         this.receiveMessageFromServer(data);
           // handle incoming message
           break;
         case "incomingNotification":
         this.receiveNotificationFromServer(data);
-          // handle incoming notification
-          break;
+        // handle incoming notification
+        break;
         default:
           // show an error in the console if the message type is unknown
           throw new Error("Unknown event type " + data.type);
@@ -86,10 +98,13 @@ class App extends Component {
   }
   
   render() {
+    console.log(this.state)
+   
     return (
       <div>
         <nav className="navbar">
           <a href="/" className="navbar-brand">Chatty</a>
+          <span>USER COUNT: {this.state.userCount.count}</span>
         </nav>
         <MessageList messages  = {this.state.messages} />
         <ChatBar addUser = {this.addUser} addMessage = {this.addMessage} currentUser = {this.state.currentUser.name} />

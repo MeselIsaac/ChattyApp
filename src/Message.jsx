@@ -17,8 +17,8 @@ class Message extends Component {
       return (
       <div>
         <main>
-          <div className="message system">
-            <span className="username-change">{this.props.message.content}</span>
+          <div className="notification">
+            <span className="notification-content">{this.props.message.content}</span>
           </div>
         </main>
       </div>
