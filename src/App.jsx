@@ -8,15 +8,22 @@ class App extends Component {
     super(props);
 
     this.state = {
-      currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
+      currentUser: {name: "Anonymous"}, // optional. if currentUser is not defined, it means the user is Anonymous
       messages: []
     };
 
     this.addMessage = this.addMessage.bind(this);
     this.receiveMessageFromServer = this.receiveMessageFromServer.bind(this);
+    this.addUser = this.addUser.bind(this);
+  
   }
 
-  addMessage(message, username) {
+  addUser(username) {
+    this.setState({currentUser: {name: username}})
+
+  }
+
+  addMessage(message) {
     const messageObj = {
       username: this.state.currentUser.name,
       content: message,
@@ -31,6 +38,7 @@ class App extends Component {
     this.setState({messages: messages})
 
   }
+  
 
   componentDidMount() {
     //connecting react app to websocket
@@ -38,18 +46,20 @@ class App extends Component {
     this.socket.onopen = () => console.log("Client connected here");
     this.socket.onmessage = this.receiveMessageFromServer;
     
+    
+    
 
   }
   
   render() {
-    console.log("THIS.STATE.MESSAGES", this.state.messages)
+    
     return (
       <div>
         <nav className="navbar">
           <a href="/" className="navbar-brand">Chatty</a>
         </nav>
         <MessageList messages = {this.state.messages}/>
-        <ChatBar addMessage = {this.addMessage} currentUser= {this.state.currentUser.name} />
+        <ChatBar addUser = {this.addUser} addMessage = {this.addMessage} currentUser = {this.state.currentUser.name} />
       </div>
      
     );
