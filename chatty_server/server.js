@@ -17,12 +17,8 @@ const wss = new SocketServer({ server });
 
 wss.broadcast = data => {
   wss.clients.forEach(ws => {
-    console.log("RUnnin")
-    console.log(ws.readyState, WebSocket.OPEN)
     
     if (ws.readyState === WebSocket.OPEN) {
-      
-      console.log("INSIDE IF")
       ws.send(data);
     }
   });
@@ -34,23 +30,45 @@ wss.broadcast = data => {
 wss.on('connection', (ws) => {
   console.log('Client connected YAY');
   ws.on("message", message => {
-    const messageObj = JSON.parse(message);
+    const data = JSON.parse(message);
+    switch(data.type) {
 
-    const messageToBroadcast = {
-      id: uuidv4(),
-      content: messageObj.content,
-      username: messageObj.username
+      case "postMessage":
+
+      const messageToBroadcast = {
+        type: "incomingMessage",
+        id: uuidv4(),
+        content: data.content,
+        username: data.username
+
+      }
+      console.log(messageToBroadcast);
+      wss.broadcast(JSON.stringify(messageToBroadcast));
+
+      break;
+
+      case "postNotification":
+
+      const usernameToBroadcast = {
+        type: "incomingNotification",
+        id: uuidv4(),
+        content: data.content
+
+      }
+
+      console.log(usernameToBroadcast);
+      wss.broadcast(JSON.stringify(usernameToBroadcast));
+
+      break;
+
+      default:
+      throw new Error("Unknown event type " + data.type);
 
     }
-    console.log(JSON.stringify(messageToBroadcast))
-    wss.broadcast(JSON.stringify(messageToBroadcast));
+   
   })
  
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
   // ws.on('close', () => console.log('Client disconnected'));
 });
-
-// exampleSocket.onmessage = function (event) {
-//   console.log(event.data);
-// }

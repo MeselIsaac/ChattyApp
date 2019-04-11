@@ -13,7 +13,7 @@ class App extends Component {
     };
 
     this.addMessage = this.addMessage.bind(this);
-    this.receiveMessageFromServer = this.receiveMessageFromServer.bind(this);
+    // this.receiveMessageFromServer = this.receiveMessageFromServer.bind(this);
     this.addUser = this.addUser.bind(this);
   
   }
@@ -21,10 +21,17 @@ class App extends Component {
   addUser(username) {
     this.setState({currentUser: {name: username}})
 
+    const usernameObj = {
+      type: "postNotification",
+      content: `User has change their name to ${username}`
+    }
+    this.socket.send(JSON.stringify(usernameObj))
+
   }
 
   addMessage(message) {
     const messageObj = {
+      type: "postMessage",
       username: this.state.currentUser.name,
       content: message,
     }
@@ -32,10 +39,17 @@ class App extends Component {
     
   }
 
-  receiveMessageFromServer (event) {
-    const message = JSON.parse(event.data);
+  receiveMessageFromServer  = (data) => {
+    const message = data;
     const messages = this.state.messages.concat(message);
     this.setState({messages: messages})
+
+  }
+
+  receiveNotificationFromServer  = (data) => {
+    const notification = data;
+    const notifications = this.state.messages.concat(notification);
+    this.setState({messages: notifications})
 
   }
   
@@ -44,7 +58,27 @@ class App extends Component {
     //connecting react app to websocket
     this.socket = new WebSocket ("ws://localhost:3001");
     this.socket.onopen = () => console.log("Client connected here");
-    this.socket.onmessage = this.receiveMessageFromServer;
+    // this.socket.onmessage = this.receiveMessageFromServer;
+
+    this.socket.onmessage = (event) => {
+      // The socket event data is encoded as a JSON string.
+      // This line turns it into an object
+      const data = JSON.parse(event.data);
+      switch(data.type) {
+        case "incomingMessage":
+        this.receiveMessageFromServer(data);
+          // handle incoming message
+          break;
+        case "incomingNotification":
+        this.receiveNotificationFromServer(data);
+          // handle incoming notification
+          break;
+        default:
+          // show an error in the console if the message type is unknown
+          throw new Error("Unknown event type " + data.type);
+      }
+    };
+  
     
     
     
@@ -52,13 +86,12 @@ class App extends Component {
   }
   
   render() {
-    
     return (
       <div>
         <nav className="navbar">
           <a href="/" className="navbar-brand">Chatty</a>
         </nav>
-        <MessageList messages = {this.state.messages}/>
+        <MessageList messages  = {this.state.messages} />
         <ChatBar addUser = {this.addUser} addMessage = {this.addMessage} currentUser = {this.state.currentUser.name} />
       </div>
      
