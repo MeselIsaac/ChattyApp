@@ -38,7 +38,7 @@ class App extends Component {
         <ChatBar sendMessageToServer = {this.sendMessageToServer} currentUser = {this.state.currentUser.name} />
       </div>
     );
-  }
+  };
 
 //-------------------------------------------------------2 FUNCTIONS----------------------------------------------------------------------------
   /*Handler receives either a user created message or username and depending on the type constructs the appropriate object 
